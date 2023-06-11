@@ -27,6 +27,10 @@ function __awaiter(thisArg, _arguments, P, generator) {
 
 var version = "1.0.0";
 
+function getUserAgent() {
+    return navigator.userAgent;
+}
+
 function getAppVersion() {
     const appVersion = navigator.appVersion;
     if (appVersion == undefined) {
@@ -45,14 +49,257 @@ function getRTT() {
     return navigator.connection.rtt;
 }
 
-function getUserAgent() {
-    return navigator.userAgent;
+function getWindowSize() {
+    return {
+        outerWidth: window.outerWidth,
+        outerHeight: window.outerHeight,
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+    };
+}
+
+function getPluginsLength() {
+    if (navigator.plugins === undefined) {
+        return -2;
+    }
+    if (navigator.plugins.length) {
+        return -1;
+    }
+    return navigator.plugins.length;
+}
+
+function getPluginsArray() {
+    if (navigator.plugins === undefined) {
+        return false;
+    }
+    if (window.PluginArray === undefined) {
+        return false;
+    }
+    return navigator.plugins instanceof PluginArray;
+}
+
+function getErrorTrace() {
+    try {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        null[0]();
+    }
+    catch (error) {
+        if (error instanceof Error && error['stack'] != null) {
+            return error.stack.toString();
+        }
+    }
+    return '';
+}
+
+function getProductSub() {
+    const { productSub } = navigator;
+    if (productSub === undefined) {
+        return '';
+    }
+    return productSub;
+}
+
+function getWindowExternal() {
+    if (window.external === undefined) {
+        return 'undefined';
+    }
+    const { external } = window;
+    if (typeof external.toString !== 'function') {
+        return 'not a function';
+    }
+    return external.toString();
+}
+
+function getMimeTypesConsistency() {
+    if (navigator.mimeTypes === undefined) {
+        return false;
+    }
+    const { mimeTypes } = navigator;
+    let isConsistent = Object.getPrototypeOf(mimeTypes) === MimeTypeArray.prototype;
+    for (let i = 0; i < mimeTypes.length; i++) {
+        isConsistent && (isConsistent = Object.getPrototypeOf(mimeTypes[i]) === MimeType.prototype);
+    }
+    return isConsistent;
+}
+
+function getEvalLength() {
+    return eval.toString().length;
+}
+
+function getWebGL() {
+    const canvasElement = document.createElement('canvas');
+    if (typeof canvasElement.getContext !== 'function') {
+        return {
+            vendor: '',
+            renderer: '',
+        };
+    }
+    const webGLContext = canvasElement.getContext('webgl');
+    if (webGLContext === null) {
+        return {
+            vendor: '',
+            renderer: '',
+        };
+    }
+    if (typeof webGLContext.getParameter !== 'function') {
+        return {
+            vendor: '',
+            renderer: '',
+        };
+    }
+    const vendor = webGLContext.getParameter(webGLContext.VENDOR);
+    const renderer = webGLContext.getParameter(webGLContext.RENDERER);
+    return { vendor: vendor, renderer: renderer };
+}
+
+function getWebDriver() {
+    if (navigator.webdriver == undefined) {
+        return false;
+    }
+    return navigator.webdriver;
+}
+
+function getLanguages() {
+    const n = navigator;
+    const result = [];
+    const language = n.language || n.userLanguage || n.browserLanguage || n.systemLanguage;
+    if (language !== undefined) {
+        result.push([language]);
+    }
+    if (Array.isArray(n.languages)) {
+        result.push(n.languages);
+    }
+    else if (typeof n.languages === 'string') {
+        const languages = n.languages;
+        if (languages) {
+            result.push(languages.split(','));
+        }
+    }
+    return result;
+}
+
+function getNotificationPermissions() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (window.Notification === undefined) {
+            return false;
+        }
+        if (navigator.permissions === undefined) {
+            return false;
+        }
+        const { permissions } = navigator;
+        if (typeof permissions.query !== 'function') {
+            return false;
+        }
+        try {
+            const permissionStatus = yield permissions.query({ name: 'notifications' });
+            return window.Notification.permission === 'denied' && permissionStatus.state === 'prompt';
+        }
+        catch (e) {
+            return false;
+        }
+    });
+}
+
+function getDocumentElementKeys() {
+    if (document.documentElement === undefined) {
+        return [''];
+    }
+    const { documentElement } = document;
+    if (typeof documentElement.getAttributeNames !== 'function') {
+        return [''];
+    }
+    return documentElement.getAttributeNames();
+}
+
+function getFunctionBind() {
+    if (Function.prototype.bind === undefined) {
+        return '';
+    }
+    return Function.prototype.bind.toString();
+}
+
+function getProcess() {
+    if (window.process === undefined) {
+        return { type: '' };
+    }
+    return window.process;
+}
+
+function getObjectProps(obj) {
+    return Object.getOwnPropertyNames(obj);
+}
+function getDocumentProperties() {
+    if (window.document === undefined) {
+        return [''];
+    }
+    return getObjectProps(window.document);
+}
+
+function getWindowProps() {
+    return Object.getOwnPropertyNames(window);
+}
+
+function getDeviceMemory() {
+    if (navigator.deviceMemory === undefined) {
+        return -1;
+    }
+    return navigator.deviceMemory;
+}
+
+//interface IPCheckResponse {
+//    'ip':string
+//    'country': string
+//    'geo-ip': string
+//    'API-help': string
+//}
+function getBrowserSideIP() {
+    //const ip_resp;
+    const ip_json = fetch('http://jsonip.com/').then(res => res.json());
+    console.log(ip_json.toString());
+    return ip_json.toString();
+}
+
+function getWindowData() {
+    return {
+        windowsOpenNum: window.window.length,
+        devicePixelRatio: window.devicePixelRatio,
+        windowFrames: window.length,
+        windowPageXOffset: window.scrollX,
+        windowPageYOffset: window.scrollY,
+        windowPixelDepth: window.screen.pixelDepth,
+    };
+}
+
+function getTimeStamp() {
+    return new Date().toString();
 }
 
 const signals = {
     userAgent: getUserAgent,
     appVersion: getAppVersion,
     rtt: getRTT,
+    windowSize: getWindowSize,
+    pluginsLength: getPluginsLength,
+    pluginsArray: getPluginsArray,
+    errorTrace: getErrorTrace,
+    productSub: getProductSub,
+    windowExternal: getWindowExternal,
+    mimeTypesConsistent: getMimeTypesConsistency,
+    evalLength: getEvalLength,
+    webGL: getWebGL,
+    webDriver: getWebDriver,
+    languages: getLanguages,
+    notificationPermissions: getNotificationPermissions,
+    documentElementKeys: getDocumentElementKeys,
+    functionBind: getFunctionBind,
+    process: getProcess,
+    documentProps: getDocumentProperties,
+    windowProps: getWindowProps,
+    deviceMemory: getDeviceMemory,
+    browsersideip: getBrowserSideIP,
+    windowData: getWindowData,
+    timestamp: getTimeStamp,
 };
 
 /**
